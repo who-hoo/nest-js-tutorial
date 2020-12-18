@@ -1,39 +1,35 @@
 import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
+import { CreateMovieDto } from './dto/create-movie.dto';
+import { UpdateMovieDto } from './dto/update-movie.dto';
+import { Movie } from './entities/movie.entity';
+import { MoviesService } from './movies.service';
 
 @Controller('movies')
 export class MoviesController {
-    @Get()
-    getAll() {
-        return 'This will return all movies';
-    }
+    constructor(private readonly moviesService: MoviesService) {}
 
-    @Get('search') // search 부분이 get보다 밑에 있으면 search를 id로 판단하는 것 유의
-    search(@Query("year") searchingYear: string) {
-        return `We are searching for a movie made after: ${searchingYear}`;
+    @Get()
+    getAll(): Movie[] {
+        return this.moviesService.getAll();
     }
 
     @Get('/:id')
-    getOne(@Param('id') movieID: string) {
-        return `This will return one movie with the id: ${movieID}`;
+    getOne(@Param('id') movieID: number): Movie {
+        return this.moviesService.getOne(movieID);
     }
 
     @Post()
-    create(@Body() movieData) {
-        // return 'This will create a movie'
-        return movieData;
+    create(@Body() movieData: CreateMovieDto) {
+        return this.moviesService.create(movieData);
     }
 
     @Delete('/:id')
-    delete(@Param('id') movieID: string) {
-        return `This will delete a movie with the id : ${movieID}`;
+    delete(@Param('id') movieID: number) {
+        return this.moviesService.delete(movieID);
     }
 
     @Patch('/:id')
-    patch(@Param('id') movieID: string, @Body() updateData) {
-        // return `This will patch a movie with the id: ${movieID}`;
-        return {
-            updatedMovie: movieID,
-            ...updateData,
-        };
+    patch(@Param('id') movieID: number, @Body() updateData: UpdateMovieDto) {
+        return this.moviesService.update(movieID, updateData);
     }
 }
